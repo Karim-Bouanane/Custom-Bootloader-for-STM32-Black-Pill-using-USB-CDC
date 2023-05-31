@@ -2,6 +2,7 @@
 /* Includes --------------------------------------------------------------*/
 
 #include "../Inc/flash.h"
+#include "../Inc/bootloader.h"
 
 /* Typedef --------------------------------------------------------------*/
 
@@ -126,8 +127,8 @@ void Bootloader_JumToApplication(void)
     __disable_irq();
 
     // Reset peripherals
-    HAL_RCC_DeInit(); // cant deinitialize it because we're using usb peripheral which needs HSE
-    HAL_DeInit(); // cant deinitialize it because all peripherals will be reset
+    HAL_RCC_DeInit();
+    HAL_DeInit();
 
     // Reset Systick
     SysTick->CTRL = 0;  // Disable SysTick
@@ -175,23 +176,21 @@ void Bootloader_JumpToSysMemory(void)
 
 uint8_t Bootloader_CheckApplicationExist(bool *app_exist)
 {
-    uint32_t appMainEntryAddr;
+    uint32_t stack_address = 0;
 
-    if (Flash_Read(APP_START_ADDRESS + 4, &appMainEntryAddr, 1) != FLASH_OK)
+    if (Flash_Read(APP_START_ADDRESS, &stack_address, 1) != FLASH_OK)
     {
-        return BL_ERROR;
+        return;
     }
 
-    // Check if the application start address is valid
-    if (appMainEntryAddr < APP_START_ADDRESS || appMainEntryAddr > (APP_END_ADDRESS - 4))
+    if ((stack_address < RAM_BASE_ADDRESS) && ((stack_address - RAM_BASE_ADDRESS) > RAM_SIZE))
     {
-        // Invalid application start address
         *app_exist = false;
     }
 
     *app_exist = true;
 
-    return BL_TRUE;
+    return BL_OK;
 }
 
 

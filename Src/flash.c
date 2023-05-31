@@ -1,4 +1,8 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "flash.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_flash.h"
@@ -241,13 +245,3 @@ uint8_t Flash_WriteAppSize(uint32_t app_size)
 
     return FLASH_OK;
 }
-
-/*
-uint8_t Flash_CheckForApp(void)
-{
-
-	// check the magic number or the checksum
-    return (((*(uint32_t*)APP_ADDRESS) - RAM_BASE) <= RAM_SIZE) ? BL_OK
-                                                                : BL_NO_APP;
-}
-*/

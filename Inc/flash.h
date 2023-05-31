@@ -3,9 +3,6 @@
 
 /* Includes --------------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 /* Macro definitions --------------------------------------------------------------*/
 
@@ -36,6 +33,10 @@
 #define FLASH_SIZE					(uint32_t)0X80000	// 512 kilobytes
 
 #define FLASH_BASE_ADDRESS			FLASH_SECTOR_0_ADDRESS
+
+#define RAM_BASE_ADDRESS            (uint32_t)0x20000000
+#define RAM_SIZE                    (uint32_t)0x20000
+
 #define APP_START_ADDRESS 			FLASH_SECTOR_2_ADDRESS
 #define APP_END_ADDRESS 			(uint32_t)0x0807FFF8
 #define APP_SIZE_ADDRESS			(uint32_t)0x0807FFF8
