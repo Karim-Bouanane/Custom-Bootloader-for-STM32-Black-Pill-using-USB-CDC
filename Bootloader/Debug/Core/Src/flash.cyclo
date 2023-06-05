@@ -1,0 +1,5 @@
+flash.c:21:9:Flash_Init	2
+flash.c:45:9:Flash_EraseSector	2
+flash.c:82:9:Flash_Write_Word	8
+flash.c:133:9:Flash_Read_Word	5
+flash.c:163:10:Flash_GetChecksum	1
