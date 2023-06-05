@@ -1,0 +1,8 @@
+../Core/Src/bootloader.c:28:13:SendError	16	static
+../Core/Src/bootloader.c:41:13:SendCmdAck	24	static
+../Core/Src/bootloader.c:54:13:SendPacketAck	24	static
+../Core/Src/bootloader.c:69:6:Bootloader_Run	16	static
+../Core/Src/bootloader.c:198:6:Bootloader_JumToApplication	24	static,ignoring_inline_asm
+../Core/Src/bootloader.c:227:6:Bootloader_CheckApplicationExist	16	static
+../Core/Src/bootloader.c:247:9:Bootloader_EraseApplication	16	static
+../Core/Src/bootloader.c:330:9:Bootloader_VerifyAppChecksum	24	static
