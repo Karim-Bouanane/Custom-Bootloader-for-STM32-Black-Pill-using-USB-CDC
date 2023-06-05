@@ -4,9 +4,10 @@
 /* Includes --------------------------------------------------------------*/
 
 
+
 /* Macro definitions --------------------------------------------------------------*/
 
-#define TOTAL_SECTORS               8		// Sector 0 - 7
+#define FLASH_TOTAL_SECTORS         8		// Sector 0 - 7
 #define BOOTLOADER_TOTAL_SECTORS    2		// Sector 0 and Sector 1
 #define APP_START_SECTOR			2		// Sector 2
 #define APP_TOTAL_SECTORS           TOTAL_SECTORS - APP_START_SECTOR	// 6 Sectors
@@ -31,19 +32,15 @@
 
 #define PAGE_SIZE					(uint16_t)0x400	 	// 1 kilobytes
 #define FLASH_SIZE					(uint32_t)0X80000	// 512 kilobytes
+#define RAM_SIZE					(uint32_t)0x2000	// 128 kilobytes
 
 #define FLASH_BASE_ADDRESS			FLASH_SECTOR_0_ADDRESS
 
-#define RAM_BASE_ADDRESS            (uint32_t)0x20000000
-#define RAM_SIZE                    (uint32_t)0x20000
+#define APP_START_ADDRESS 			(uint32_t)0x08008000
+#define APP_END_ADDRESS 			(uint32_t)0x08080000
 
-#define APP_START_ADDRESS 			FLASH_SECTOR_2_ADDRESS
-#define APP_END_ADDRESS 			(uint32_t)0x0807FFF8
-#define APP_SIZE_ADDRESS			(uint32_t)0x0807FFF8
-#define APP_CRC_ADDRESS 			(uint32_t)0x0807FFFC
-
-
-#define SYSMEM_ADDRESS 				(uint32_t)0x1FFF0000
+#define RAM_BASE_ADDRESS			(uint32_t)0x20000000
+#define RAM_END_ADDRESS				(uint32_t)0x20020000
 
 
 /* Enumerations --------------------------------------------------------------*/
@@ -51,34 +48,27 @@
 /**
  * @brief  Error codes for flash operations.
  */
-enum eFlashErrorCodes
+typedef enum
 {
     FLASH_OK = 0,                   /*!< No error */
     FLASH_NO_APP,                   /*!< No application found in flash */
     FLASH_UNL_ERROR,                /*!< Flash unlock failed */
-    FLASH_CHKS_ERROR,               /*!< Application checksum incorrect */
     FLASH_ERASE_ERROR,              /*!< Flash erase failed */
     FLASH_WRITE_ERROR,              /*!< Flash write failed */
     FLASH_READ_OVER_ERROR,          /*!< Flash read exceeds address range */
     FLASH_WRITE_OVER_ERROR,         /*!< Flash write exceeds address range */
     FLASH_WRITE_CORR_ERROR,         /*!< Flash write incorrect */
-    FLASH_WRITE_CHKS_ERROR,         /*!< Flash write checksum incorrect */
-    FLASH_WRITE_APPSIZE_ERROR,      /*!< Flash write application size incorrect */
-};
+
+} e_Flash_Errors;
 
 
 /* Functions -----------------------------------------------------------------*/
 
-uint8_t Flash_Begin(void);
+uint8_t Flash_Init(void);
 uint8_t Flash_EraseSector(uint8_t sector);
-uint8_t Flash_EraseApplication(void);
-uint8_t Flash_Write(uint32_t address, uint32_t *data, uint32_t size);
-uint8_t Flash_Read(uint32_t address, uint32_t *data, uint32_t size);
-uint8_t Flash_End(void);
-uint8_t Flash_CalculateAppChecksum(uint32_t *checksum_value);
-uint8_t Flash_WriteChecksum(uint32_t checksum_value);
-uint8_t Flash_VerifyChecksum(void);
-uint8_t Flash_WriteAppSize(uint32_t app_size);
+uint8_t Flash_Read_Word(uint32_t address, uint32_t *data, uint32_t size);
+uint8_t Flash_Write_Word(uint32_t address, uint32_t *data, uint32_t size);
+uint32_t Flash_GetChecksum(uint32_t start_address, uint32_t size);
 
 
 #endif /* __FLASH_H */
