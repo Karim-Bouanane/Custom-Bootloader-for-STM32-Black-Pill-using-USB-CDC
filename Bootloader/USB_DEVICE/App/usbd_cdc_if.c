@@ -23,6 +23,10 @@
 
 /* USER CODE BEGIN INCLUDE */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,6 +35,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+
+
 
 /* USER CODE END PV */
 
@@ -94,6 +100,10 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
+
+static uint8_t is_data_available = 0;
+static uint16_t data_size = 0;
+static uint8_t buf[7] = {0};
 
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -220,11 +230,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-
+    	memcpy(buf, pbuf, 7);
     break;
 
     case CDC_GET_LINE_CODING:
-
+    	memcpy(pbuf, buf, 7);
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
@@ -261,8 +271,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  is_data_available = 1;
+  data_size = (uint16_t)(*Len);
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -316,6 +329,23 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+uint16_t CDC_Get_Received_Data_FS(uint8_t *rcv_data, uint32_t timeout)
+{
+	uint32_t prev_time = HAL_GetTick();
+
+	while((is_data_available != 1) && ((HAL_GetTick() - prev_time) < timeout))
+	{}
+
+	if(is_data_available == 1)
+	{
+		is_data_available = 0;
+		memcpy(rcv_data, UserRxBufferFS, data_size);
+		return data_size;
+	}
+
+	return 0;
+}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 

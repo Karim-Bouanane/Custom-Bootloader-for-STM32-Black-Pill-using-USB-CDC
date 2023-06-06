@@ -32,7 +32,7 @@
 
 #define PAGE_SIZE					(uint16_t)0x400	 	// 1 kilobytes
 #define FLASH_SIZE					(uint32_t)0X80000	// 512 kilobytes
-#define RAM_SIZE					(uint32_t)0x2000	// 128 kilobytes
+#define RAM_SIZE					(uint32_t)0x20000	// 128 kilobytes
 
 #define FLASH_BASE_ADDRESS			FLASH_SECTOR_0_ADDRESS
 

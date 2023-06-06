@@ -119,36 +119,34 @@ int main(void)
   while(1){}
 
    */
-
+  uint8_t rcv_data[100] = {0};
+  uint16_t data_size = 0;
 
   while (1)
   {
 
 	  if(Bootloader_CheckApplicationExist() == true)
 	  {
-		  for(int i = 0; i < 10; i++)
+		  /*
+		  for(int i = 0; i < 20; i++)
 		  {
 			  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 			  HAL_Delay(200);
 		  }
 
-		  Bootloader_JumToApplication();
+		  data_size = CDC_Get_Received_Data_FS(rcv_data, 0xFFFFFFFF);
+
+		  CDC_Transmit_FS(rcv_data, data_size);
+
+		  CDC_Transmit_FS("Application Exist.\n", strlen("Application Exist.\n"));
+
+		  */
+		  test();
+		  HAL_Delay(1000);
+
+		  //Bootloader_JumToApplication();
+
 	  }
-
-	  /*
-	  data_size = CDC_Get_Received_Data_FS(usb_rx_buffer, 1000);
-
-	  if (data_size > 0)
-	  {
-		  CDC_Transmit_FS(usb_rx_buffer, data_size);
-	  }
-
-	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-
-	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-
-	  HAL_Delay(500);
-	*/
 
     /* USER CODE END WHILE */
 

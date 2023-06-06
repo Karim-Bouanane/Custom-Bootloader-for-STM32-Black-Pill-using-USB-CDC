@@ -36,8 +36,8 @@ typedef enum
 typedef enum
 {
 	CMD_ACK				= 0x10,
-	CMD_PACKET_ACK		= 0x20,
-	CMD_PACKET			= 0x30,
+	CMD_PACKET			= 0x20,
+	CMD_PACKET_ACK		= 0x30,
 	CMD_ERROR			= 0x40,
 	CMD_EXECUTE			= 0x60,
 	CMD_ERASE_APP		= 0x70,
@@ -55,5 +55,6 @@ uint8_t Bootloader_EraseApplication(void);
 uint8_t Bootloader_DownloadFW(uint32_t *app_size);
 uint8_t Bootloader_VerifyAppChecksum(uint32_t app_checksum, uint32_t app_size);
 
+void test(void);
 
 #endif /* __BOOTLOADER_H */

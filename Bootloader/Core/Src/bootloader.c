@@ -12,7 +12,7 @@
 
 /* Macro Definition --------------------------------------------------------------*/
 
-#define MAX_TIMEOUT				5000
+#define MAX_TIMEOUT				(uint32_t)0xFFFFFFFF
 #define NO_TIMEOUT				0
 #define PACKET_HEADER_SIZE		5
 
@@ -27,42 +27,73 @@ uint8_t error_id = BL_OK;
 
 static void SendError(void)
 {
-	uint8_t error_msg[4] = {0};
+	uint8_t error_msg[5] = {0};
 
 	error_msg[0] = CMD_ERROR;
 	error_msg[1] = error_id;
 	error_msg[2] = 0;				// padding
 	error_msg[3] = 0;				// padding
+	error_msg[4] = 0;				// padding
 
-	CDC_Transmit_FS(error_msg, 4);
+	CDC_Transmit_FS(error_msg, 5);
 }
 
 
 static void SendCmdAck(uint8_t command_id)
 {
-	uint8_t cmd_ack_msg[4] = {0};
+	uint8_t cmd_ack_msg[5] = {0};
 
 	cmd_ack_msg[0] = CMD_ACK;
 	cmd_ack_msg[1] = command_id;
 	cmd_ack_msg[2] = 0; 			// padding
 	cmd_ack_msg[3] = 0; 			// padding
+	cmd_ack_msg[4] = 0; 			// padding
 
-	CDC_Transmit_FS(cmd_ack_msg, 4);
+	CDC_Transmit_FS(cmd_ack_msg, 5);
 }
 
 
 static void SendPacketAck(uint8_t packet_number, uint16_t packet_size)
 {
-	uint8_t packet_ack_msg[4] = {0};
+	uint8_t packet_ack_msg[5] = {0};
 
 	packet_ack_msg[0] = CMD_PACKET_ACK;
-	packet_ack_msg[1] = packet_number;
-	packet_ack_msg[2] = (uint8_t)(packet_size);
-	packet_ack_msg[3] = (uint8_t)(packet_size >> 8);
+	packet_ack_msg[1] = (uint8_t)(packet_number);
+	packet_ack_msg[2] = (uint8_t)(packet_number >> 8);
+	packet_ack_msg[3] = (uint8_t)(packet_size);
+	packet_ack_msg[4] = (uint8_t)(packet_size >> 8);
 
-	CDC_Transmit_FS(packet_ack_msg, 4);
+	CDC_Transmit_FS(packet_ack_msg, 5);
 }
 
+
+void test(void)
+{
+	// error_id = BL_CMD_INVALID_ERROR;
+	// SendError();
+
+	// SendCmdAck(STATE_EXECUTE);
+
+	uint8_t packet_buffer[100] = {0};
+	uint16_t recv_size;
+	uint16_t packet_size;
+	uint8_t cmd_id;
+	uint16_t packet_number;
+
+	recv_size = CDC_Get_Received_Data_FS(packet_buffer, MAX_TIMEOUT);
+
+	cmd_id = packet_buffer[0];
+	packet_number = (uint16_t)packet_buffer[1] + (((uint16_t)packet_buffer[2]) << 8);
+	packet_size = (uint16_t)packet_buffer[3] + (((uint16_t)packet_buffer[4]) << 8);
+
+	CDC_Transmit_FS(packet_buffer, recv_size);
+
+	if((cmd_id == CMD_PACKET) && (packet_size == (recv_size - 1)))
+	{
+		SendPacketAck(packet_number, packet_size);
+	}
+
+}
 
 /* Functions --------------------------------------------------------------*/
 
@@ -197,12 +228,9 @@ void Bootloader_Run(void)
 
 void Bootloader_JumToApplication(void)
 {
-    uint32_t application_entry_point_address = (*(volatile uint32_t *)(APP_START_ADDRESS + 4));
+    uint32_t application_entry_point_address = *(volatile uint32_t *)(APP_START_ADDRESS + 4);
 
     pFunction application_entry_point = (pFunction)application_entry_point_address ;
-
-    // Disable interrupts
-    __disable_irq();
 
     // Reset peripherals
     HAL_RCC_DeInit();
@@ -230,7 +258,7 @@ bool Bootloader_CheckApplicationExist(void)
 
     Flash_Read_Word(APP_START_ADDRESS, &stack_address, (uint32_t)1);
 
-    if ((stack_address < RAM_BASE_ADDRESS) && ((stack_address - RAM_BASE_ADDRESS) > RAM_SIZE))
+    if ((stack_address < RAM_BASE_ADDRESS) || ((stack_address - RAM_BASE_ADDRESS) > RAM_SIZE))
     {
         return false;
     }

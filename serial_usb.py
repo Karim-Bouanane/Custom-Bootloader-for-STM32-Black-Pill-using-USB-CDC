@@ -1,51 +1,49 @@
-import usb.core
+import serial
+import serial.tools.list_ports
 
-# USB device vendor and product IDs
-vendor_id = 0x1234  # Replace with the correct vendor ID
-product_id = 0x5678  # Replace with the correct product ID
+# Vendor ID and Product ID of the USB device
+vendor_id = 1055  # vendor ID
+product_id = 22300  # product ID
 
-# Find the USB device
-device = usb.core.find(idVendor=vendor_id, idProduct=product_id)
+#
+ports = serial.tools.list_ports.comports()
 
-# Check if the device is found
-if device is not None:
-    print("USB device found.")
+#
+device_port = None
 
-    # Set the active configuration
-    device.set_configuration()
+for port in ports:
+    if port.vid == vendor_id and port.pid == product_id:
+        device_port = port.device
 
-    # Find the IN endpoint
-    endpoint_in = None
-    for cfg in device:
-        for intf in cfg:
-            if (
-                usb.util.endpoint_direction(intf.bEndpointAddress)
-                == usb.util.ENDPOINT_IN
-            ):
-                endpoint_in = intf[0]
-
-    # Check if the IN endpoint is found
-    if endpoint_in is not None:
-        print("IN endpoint found.")
-
-        # Read data from the device
-        try:
-            while True:
-                # Read data from the IN endpoint
-                data = device.read(
-                    endpoint_in.bEndpointAddress, endpoint_in.wMaxPacketSize
-                )
-
-                # Process and print the received data
-                print("Received:", data)
-        except KeyboardInterrupt:
-            # Handle keyboard interrupt (Ctrl+C)
-            print("USB reading interrupted.")
-    else:
-        print("IN endpoint not found.")
+#
+if device_port is not None:
+    print("Device found")
 else:
-    print("USB device not found.")
+    raise Exception("Device not found")
 
+
+ser = serial.Serial(device_port)
+print(ser.name)
+
+ser.close()
+
+# Define your message
+message = b"\x20\x02\x00\x12\x00Hello Worldoo"
+
+
+"""
+with open("file.elf", "rb") as file:
+    elf_data = file.read()
+
+# Split the ELF data into 1KB chunks
+chunk_size = 1024
+chunks = [elf_data[i : i + chunk_size] for i in range(0, len(elf_data), chunk_size)]
+
+# Send the chunks to the USB device
+for chunk in chunks:
+    device.write(1, chunk, 100)  # Endpoint 1, data chunk, timeout of 100ms
+
+"""
 
 """
 import crcmod

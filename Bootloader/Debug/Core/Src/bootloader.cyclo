@@ -1,8 +1,9 @@
 bootloader.c:28:13:SendError	1
-bootloader.c:41:13:SendCmdAck	1
-bootloader.c:54:13:SendPacketAck	1
-bootloader.c:69:6:Bootloader_Run	14
-bootloader.c:198:6:Bootloader_JumToApplication	1
-bootloader.c:227:6:Bootloader_CheckApplicationExist	3
-bootloader.c:247:9:Bootloader_EraseApplication	5
-bootloader.c:330:9:Bootloader_VerifyAppChecksum	2
+bootloader.c:42:13:SendCmdAck	1
+bootloader.c:56:13:SendPacketAck	1
+bootloader.c:70:6:test	3
+bootloader.c:100:6:Bootloader_Run	14
+bootloader.c:229:6:Bootloader_JumToApplication	1
+bootloader.c:255:6:Bootloader_CheckApplicationExist	3
+bootloader.c:275:9:Bootloader_EraseApplication	5
+bootloader.c:358:9:Bootloader_VerifyAppChecksum	2
