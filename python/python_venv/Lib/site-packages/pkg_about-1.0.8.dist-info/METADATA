@@ -1,0 +1,184 @@
+Metadata-Version: 2.1
+Name: pkg-about
+Version: 1.0.8
+Summary: Shares Python package metadata at runtime.
+Author: Adam Karpierz
+Author-email: adam@karpierz.net
+Maintainer: Adam Karpierz
+Maintainer-email: adam@karpierz.net
+License: zlib/libpng License ; https://opensource.org/licenses/Zlib
+Project-URL: Homepage, https://pypi.org/project/pkg_about/
+Project-URL: Documentation, https://pkg_about.readthedocs.io/
+Project-URL: Download, https://pypi.org/project/pkg_about/
+Project-URL: Source, https://github.com/karpierz/pkg_about
+Project-URL: Issues, https://github.com/karpierz/pkg_about/issues
+Keywords: pkg_about,__about__,packaging
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: zlib/libpng License
+Classifier: Operating System :: OS Independent
+Classifier: Natural Language :: Polish
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Programming Language :: Python :: Implementation :: Stackless
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: <4.0.0,>=3.7.0
+Description-Content-Type: text/x-rst; charset=UTF-8
+License-File: LICENSE
+Requires-Dist: setuptools (>=63.2.0)
+Requires-Dist: packaging (>=21.3.0)
+Requires-Dist: importlib-resources (>=5.7.1)
+Requires-Dist: importlib-metadata (>=4.12.0)
+Requires-Dist: tomli (>=2.0.1)
+Provides-Extra: doc
+Requires-Dist: docutils (<0.19,>=0.14) ; extra == 'doc'
+Requires-Dist: Sphinx (>=4.5.0) ; extra == 'doc'
+Requires-Dist: sphinx-tabs (>=3.4.1) ; extra == 'doc'
+Requires-Dist: sphinx-copybutton (>=0.5.0) ; extra == 'doc'
+Requires-Dist: sphinxcontrib-spelling (>=7.6.0) ; extra == 'doc'
+Requires-Dist: restructuredtext-lint (>=1.4.0) ; extra == 'doc'
+Requires-Dist: nbsphinx (>=0.8.9) ; extra == 'doc'
+Provides-Extra: test
+Requires-Dist: deepdiff (>=5.8.1) ; extra == 'test'
+
+pkg_about
+=========
+
+Shares Python package metadata at runtime.
+
+Overview
+========
+
+TBD...
+
+`PyPI record`_.
+
+`Documentation`_.
+
+Usage
+-----
+
+TBD...
+
+Installation
+============
+
+Prerequisites:
+
++ Python 3.7 or higher
+
+  * https://www.python.org/
+  * 3.7 is a primary test environment.
+
++ pip and setuptools
+
+  * https://pypi.org/project/pip/
+  * https://pypi.org/project/setuptools/
+
+To install run:
+
+  .. parsed-literal::
+
+    python -m pip install --upgrade |package|
+
+Development
+===========
+
+Prerequisites:
+
++ Development is strictly based on *tox*. To install it run::
+
+    python -m pip install --upgrade tox
+
+Visit `development page`_.
+
+Installation from sources:
+
+clone the sources:
+
+  .. parsed-literal::
+
+    git clone |respository| |package|
+
+and run:
+
+  .. parsed-literal::
+
+    python -m pip install ./|package|
+
+or on development mode:
+
+  .. parsed-literal::
+
+    python -m pip install --editable ./|package|
+
+License
+=======
+
+  | Copyright (c) 2020-2022 Adam Karpierz
+  | Licensed under the zlib/libpng License
+  | https://opensource.org/licenses/Zlib
+  | Please refer to the accompanying LICENSE file.
+
+Authors
+=======
+
+* Adam Karpierz <adam@karpierz.net>
+
+.. |package| replace:: pkg_about
+.. |package_bold| replace:: **pkg_about**
+.. |respository| replace:: https://github.com/karpierz/pkg_about.git
+.. _development page: https://github.com/karpierz/pkg_about
+.. _PyPI record: https://pypi.org/project/pkg_about/
+.. _Documentation: https://pkg_about.readthedocs.io/
+
+Changelog
+=========
+
+1.0.8 (2022-10-18)
+------------------
+- Tox configuration has been moved to pyproject.toml
+
+1.0.7 (2022-08-22)
+------------------
+- Setup update.
+
+1.0.6 (2022-07-24)
+------------------
+- Add __author_email__ (as alias of __email__).
+- Add __maintainer_email__.
+- Setup update (currently based mainly on pyproject.toml).
+
+1.0.5 (2022-07-20)
+------------------
+- Add about_from_setup() (to use e.g. in docs.conf.py).
+- Add support for Python 3.10 and 3.11
+- Add support for PyPy 3.7, 3.8 and 3.9
+- Setup update.
+
+1.0.4 (2022-01-10)
+------------------
+- Drop support for Python 3.6.
+- Copyright year update.
+- Setup update.
+
+1.0.3 (2021-10-14)
+------------------
+- Setup update.
+
+1.0.2 (2021-07-20)
+------------------
+- First functional release.
+
+0.0.1 (2020-10-16)
+------------------
+- Initial commit.

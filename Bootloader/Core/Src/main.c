@@ -40,9 +40,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define MAX_TIMEOUT		5000
-#define NO_TIMEOUT		0
-
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -119,34 +116,12 @@ int main(void)
   while(1){}
 
    */
-  uint8_t rcv_data[100] = {0};
-  uint16_t data_size = 0;
+
+  test();
+
 
   while (1)
   {
-
-	  if(Bootloader_CheckApplicationExist() == true)
-	  {
-		  /*
-		  for(int i = 0; i < 20; i++)
-		  {
-			  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-			  HAL_Delay(200);
-		  }
-
-		  data_size = CDC_Get_Received_Data_FS(rcv_data, 0xFFFFFFFF);
-
-		  CDC_Transmit_FS(rcv_data, data_size);
-
-		  CDC_Transmit_FS("Application Exist.\n", strlen("Application Exist.\n"));
-
-		  */
-		  test();
-		  HAL_Delay(1000);
-
-		  //Bootloader_JumToApplication();
-
-	  }
 
     /* USER CODE END WHILE */
 

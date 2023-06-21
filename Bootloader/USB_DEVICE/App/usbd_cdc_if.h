@@ -109,7 +109,12 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
 
-uint16_t CDC_Get_Received_Data_FS(uint8_t *packet_buffer, uint32_t timeout);
+uint8_t CDC_ReadRxBuffer_FS(uint8_t* Buf, uint16_t Len, uint32_t timeout);
+uint16_t CDC_GetRxBufferBytesAvailable_FS(void);
+void CDC_FlushRxBuffer_FS();
+
+
+//uint16_t CDC_Get_Received_Data_FS(uint8_t *packet_buffer, uint32_t timeout);
 
 /* USER CODE END EXPORTED_FUNCTIONS */
 

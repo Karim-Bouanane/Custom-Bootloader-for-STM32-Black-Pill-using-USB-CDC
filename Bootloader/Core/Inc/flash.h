@@ -8,9 +8,9 @@
 /* Macro definitions --------------------------------------------------------------*/
 
 #define FLASH_TOTAL_SECTORS         8		// Sector 0 - 7
-#define BOOTLOADER_TOTAL_SECTORS    2		// Sector 0 and Sector 1
-#define APP_START_SECTOR			2		// Sector 2
-#define APP_TOTAL_SECTORS           TOTAL_SECTORS - APP_START_SECTOR	// 6 Sectors
+#define BOOTLOADER_TOTAL_SECTORS    4		// Sector 0-3
+#define APP_START_SECTOR			4		// Sector 4
+#define APP_TOTAL_SECTORS           TOTAL_SECTORS - APP_START_SECTOR	// 4 Sectors
 
 //#define SECTOR_0_SIZE				16		// 16 kilobytes
 //#define SECTOR_1_SIZE				16		// 16 kilobytes
@@ -30,13 +30,13 @@
 #define FLASH_SECTOR_6_ADDRESS		(uint32_t)0x08040000
 #define FLASH_SECTOR_7_ADDRESS		(uint32_t)0x08060000
 
-#define PAGE_SIZE					(uint16_t)0x400	 	// 1 kilobytes
-#define FLASH_SIZE					(uint32_t)0X80000	// 512 kilobytes
-#define RAM_SIZE					(uint32_t)0x20000	// 128 kilobytes
+#define PAGE_SIZE					(uint16_t)0x400	 		// 1 kilobytes
+#define FLASH_SIZE					(uint32_t)0X80000		// 512 kilobytes
+#define RAM_SIZE					(uint32_t)0x20000		// 128 kilobytes
 
 #define FLASH_BASE_ADDRESS			FLASH_SECTOR_0_ADDRESS
 
-#define APP_START_ADDRESS 			(uint32_t)0x08008000
+#define APP_START_ADDRESS 			(uint32_t)0x08010000
 #define APP_END_ADDRESS 			(uint32_t)0x08080000
 
 #define RAM_BASE_ADDRESS			(uint32_t)0x20000000
