@@ -134,6 +134,8 @@ Once in the bootloader mode, you can utilize the Python GUI interface, that is f
 
 ### **USB Configuration**
 
+The Product Identifier (PID) needs to be modified to avoid conflicts with other ST devices that may have the same values. By changing the PID, we ensure that our device has a unique identifier and can be distinguished from others.
+
 <p align="center">
   <img src="./img/USB_Device_Configuration.png" />
   <img src="./img/USB_Parameter_Configuration.png" />
