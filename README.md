@@ -8,7 +8,7 @@ This personal project focuses on developing a customable bootloader specifically
   - [**Setup Overview**](#setup-overview)
   - [**Bootloader Features**](#bootloader-features)
   - [**Development Environment**](#development-environment)
-  - [**Files Organisation**](#files-organisation)
+  - [**Files Structure**](#files-structure)
   - [**How to use the GUI interface**](#how-to-use-the-gui-interface)
   - [**Bootloader Flowchart**](#bootloader-flowchart)
   - [**Bootloader Project Configurations**](#bootloader-project-configurations)
@@ -55,7 +55,7 @@ This personal project focuses on developing a customable bootloader specifically
 
 
 
-## **Files Organisation**
+## **Files Structure**
     
     .
     ├── App                                 # STM32 Project for a simple blink application
@@ -84,6 +84,7 @@ This personal project focuses on developing a customable bootloader specifically
     |     ├── main.py                       # Python program for the GUI interface of the bootloader flasher
     |     └── serial_api.py                 # Python program offering an API to communicate with the bootloader
     | 
+    ├── img                                 # Folder that contains images for README file
     └── README.md                           # README file
 
 
