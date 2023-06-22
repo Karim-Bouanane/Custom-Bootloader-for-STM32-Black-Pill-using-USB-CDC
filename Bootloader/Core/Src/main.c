@@ -86,6 +86,34 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 
+  // Initialize GPIO to read the user key input state and blink the blue LED if the bootloader mode is selected
+  MX_GPIO_Init();
+
+  // Check if user key is not pressed
+  //if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_RESET)
+  if(false)
+  {
+	// Check if user application exist in flash memory
+	if(Bootloader_CheckApplicationExist() == true)
+	{
+	  // Jump to user application
+	  Bootloader_JumToApplication();
+	}
+	// else, it will proceed to the infinite loop
+  }
+
+  // User key is pressed
+  else
+  {
+	// Blink the Blue LED 3 times to indicate the Bootloader mode
+	uint8_t i = 6;
+
+	while(i--)
+	{
+	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	  HAL_Delay(500);
+	}
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -94,31 +122,16 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
+  	// Run the Bootloader
+	Bootloader_Run();
+
+  }
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-  /*
-
-  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_RESET)
-  {
-	  Bootloader_Run();
-  }
-  else
-  {
-  	  if(Bootloader_CheckApplicationExist() == true)
-  	  {
-  	  	  Bootloader_JumToApplication();
-  	  }
-  }
-
-  while(1){}
-
-   */
-
-  test();
-
 
   while (1)
   {
@@ -221,7 +234,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : LED_Blue_Pin */
   GPIO_InitStruct.Pin = LED_Blue_Pin;
@@ -230,11 +243,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_Blue_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  /*Configure GPIO pin : User_Key_Pin */
+  GPIO_InitStruct.Pin = User_Key_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(User_Key_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

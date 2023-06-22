@@ -1,26 +1,24 @@
 #ifndef __FLASH_H
 #define __FLASH_H
 
+
 /* Includes --------------------------------------------------------------*/
 
 
 
 /* Macro definitions --------------------------------------------------------------*/
 
-#define FLASH_TOTAL_SECTORS         8		// Sector 0 - 7
-#define BOOTLOADER_TOTAL_SECTORS    4		// Sector 0-3
-#define APP_START_SECTOR			4		// Sector 4
-#define APP_TOTAL_SECTORS           TOTAL_SECTORS - APP_START_SECTOR	// 4 Sectors
+// FLASH SECTORS SIZES
+#define FLASH_SECTOR_0_SIZE			16									// 16 kilobytes
+#define FLASH_SECTOR_1_SIZE			16									// 16 kilobytes
+#define FLASH_SECTOR_2_SIZE			16									// 16 kilobytes
+#define FLASH_SECTOR_3_SIZE			16									// 16 kilobytes
+#define FLASH_SECTOR_4_SIZE			64									// 64 kilobytes
+#define FLASH_SECTOR_5_SIZE			128									// 128 kilobytes
+#define FLASH_SECTOR_6_SIZE			128									// 128 kilobytes
+#define FLASH_SECTOR_7_SIZE			128 								// 128 kilobytes
 
-//#define SECTOR_0_SIZE				16		// 16 kilobytes
-//#define SECTOR_1_SIZE				16		// 16 kilobytes
-//#define SECTOR_2_SIZE				16		// 16 kilobytes
-//#define SECTOR_3_SIZE				16		// 16 kilobytes
-//#define SECTOR_4_SIZE				64		// 64 kilobytes
-//#define SECTOR_5_SIZE				128		// 128 kilobytes
-//#define SECTOR_6_SIZE				128		// 128 kilobytes
-//#define SECTOR_7_SIZE				128 	// 128 kilobytes
-
+// FLASH SECTORS BASE ADDRESSES
 #define FLASH_SECTOR_0_ADDRESS		(uint32_t)0x08000000
 #define FLASH_SECTOR_1_ADDRESS		(uint32_t)0x08004000
 #define FLASH_SECTOR_2_ADDRESS		(uint32_t)0x08008000
@@ -30,15 +28,21 @@
 #define FLASH_SECTOR_6_ADDRESS		(uint32_t)0x08040000
 #define FLASH_SECTOR_7_ADDRESS		(uint32_t)0x08060000
 
-#define PAGE_SIZE					(uint16_t)0x400	 		// 1 kilobytes
-#define FLASH_SIZE					(uint32_t)0X80000		// 512 kilobytes
-#define RAM_SIZE					(uint32_t)0x20000		// 128 kilobytes
+// TOTAL SIZE
+#define FLASH_PAGE_SIZE				(uint16_t)0x400	 					// 1 kilobytes
+#define FLASH_SIZE					(uint32_t)0X80000					// 512 kilobytes
+#define RAM_SIZE					(uint32_t)0x20000					// 128 kilobytes
 
+// FLASH
 #define FLASH_BASE_ADDRESS			FLASH_SECTOR_0_ADDRESS
+#define FLASH_TOTAL_SECTORS         8									// Sector 0 - 7
 
-#define APP_START_ADDRESS 			(uint32_t)0x08010000
+// APPLICATION
+#define APP_BASE_ADDRESS 			(uint32_t)0x08010000
 #define APP_END_ADDRESS 			(uint32_t)0x08080000
+#define APP_START_SECTOR			4									// Sector 4
 
+// RAM
 #define RAM_BASE_ADDRESS			(uint32_t)0x20000000
 #define RAM_END_ADDRESS				(uint32_t)0x20020000
 
@@ -59,7 +63,7 @@ typedef enum
     FLASH_WRITE_OVER_ERROR,         /*!< Flash write exceeds address range */
     FLASH_WRITE_CORR_ERROR,         /*!< Flash write incorrect */
 
-} e_Flash_Errors;
+} e_Flash_Status;
 
 
 /* Functions -----------------------------------------------------------------*/

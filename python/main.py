@@ -228,12 +228,17 @@ def execute():
         LOG("No serial connection established")
 
     else:
-        LOG("Sending EXECUTE command to the bootloader")
+        #LOG("Sending EXECUTE command to the bootloader")
+        status = SendCMD(serial_port, CMD_ID_EXECUTE, LOG) 
 
-        if SendCMD(serial_port, CMD_ID_EXECUTE) == True:
+        if status == CMD_RESP_STATUS_OK:
             LOG("Bootloader Executing User Application")
-        else :
-            LOG("Bootloader not responding to the EXECUTE command")
+
+        elif status == CMD_RESP_STATUS_ERROR:
+            LOG("Execute Command Got the following Error")
+
+        else:    
+            LOG("EXECUTE command got invalid response")
 
 
 """

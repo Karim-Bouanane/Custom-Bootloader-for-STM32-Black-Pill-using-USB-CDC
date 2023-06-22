@@ -4,20 +4,46 @@ import crcmod
 import serial
 
 
-# Commands
-CMD_ID_ACK				= 0x10
-CMD_ID_PACKET			= 0x20
-CMD_ID_PACKET_ACK		= 0x30
-CMD_ID_PACKET_NACK		= 0x40
-CMD_ID_ERROR			= 0x50
-CMD_ID_EXECUTE			= 0x60
-CMD_ID_ERASE_APP		= 0x70
-CMD_ID_DOWNLOAD_FW		= 0x80
-
 # Packet
-CMD_SIZE                = 7
-RESP_SIZE               = 3
+CMD_SIZE                    = 7
+RESP_SIZE                   = 3
 
+# Response status
+CMD_RESP_STATUS_OK          = 0
+CMD_RESP_STATUS_ERROR       = 1
+CMD_RESP_STATUS_INVALID     = 2
+
+# Commands
+
+CMD_ID_ACK				    = 0x10
+CMD_ID_PACKET			    = 0x20
+CMD_ID_PACKET_ACK		    = 0x30
+CMD_ID_PACKET_NACK		    = 0x40
+CMD_ID_ERROR			    = 0x50
+CMD_ID_EXECUTE			    = 0x60
+CMD_ID_ERASE_APP		    = 0x70
+CMD_ID_DOWNLOAD_FW		    = 0x80
+
+CMD_NAME_LIST = {
+
+    CMD_ID_ACK          : 'CMD_ACK',
+    CMD_ID_PACKET       : 'PACKET',
+    CMD_ID_PACKET_ACK   : 'PACKET_ACK',
+    CMD_ID_PACKET_NACK  : 'PACKET_NACK',
+    CMD_ID_ERROR        : 'ERROR',
+    CMD_ID_EXECUTE      : 'EXECUTE',
+    CMD_ID_ERASE_APP    : 'ERASE_APP',
+    CMD_ID_DOWNLOAD_FW  : 'DOWNLOAD_FW'
+}
+
+
+# Errors
+BL_CHKS_MISMATCH			= 0x7F 		# Application checksum incorrect
+BL_CMD_INVALID              = 0x80		# Invalid command
+BL_INVALID_STATE            = 0x81		# Invalid state
+BL_RECEIVE_TIMEOUT          = 0x82		# Receive timeout reached
+BL_DOWNLOAD_FAILED          = 0x83		# Firmware download failed
+BL_NO_USER_APP              = 0x84		# No user application found
 
 """
 Function: bytes_to_hex
@@ -86,45 +112,59 @@ Description: Sends a command packet over the serial port and waits for acknowled
 @param serial_port: The serial port object.
 @param cmd: The command to send.
 @param data: Optional data to include in the command packet.
-@return: True if the command was acknowledged, False otherwise.
+@return: 
 """
-def SendCMD(serial_port, cmd, data=bytes()):
-    # Create the command packet
-    cmd_packet = bytes([cmd]) + data + bytes(CMD_SIZE - 1 - len(data))
-    print("Send the following CMD:", bytes_to_hex(cmd_packet))
+def SendCMD(serial_port, cmd, LOG):
+
+    # Initialize the command packet
+    cmd_packet = bytes(7)
+
+    if type(cmd) == int:
+        cmd_packet[0] = cmd
+    else:
+        cmd_packet = cmd + bytes(CMD_SIZE - len(cmd))
+
+    print("cmd_packet: ", cmd_packet)
+
+    LOG("Send " + CMD_NAME_LIST[cmd_id] + " Command")
 
     try:
         # Send the command packet over the serial port
         serial_port.write(cmd_packet)
 
-        # Wait for command acknowledgment
-        if ReceiveCmdAck(serial_port, cmd) == True:
-            return True
+        # Wait for command response
+        return ReceiveCmdResp(serial_port, cmd_id)
         
     except serial.SerialException as e:
-        pass
+        LOG("Error while sending Command: " + str(e))
 
-    return False
+    return CMD_RESP_STATUS_INVALID
 
 
 """
-Function: ReceiveCmdAck
+Function: ReceiveCmdResp
 Description: Receives and verifies the acknowledgment response for a command.
 @param serial_port: The serial port object.
-@param cmd: The command for which to receive the acknowledgment.
-@return: True if the command acknowledgment is received and verified, False otherwise.
+@param cmd: The command for which to receive the response.
+@return: 
 """
-def ReceiveCmdAck(serial_port, cmd):
+def ReceiveCmdResp(serial_port, cmd):
     #
     response = serial_port.read(RESP_SIZE) 
     print("Response: ", bytes_to_hex(response))
 
     if len(response) == RESP_SIZE:
+
         if response[0] == CMD_ID_ACK and response[1] == cmd:
             print("Received CMD Ack for: ", hex(cmd))
-            return True
-
-    return False
+            return CMD_RESP_STATUS_OK
+        
+        elif response[0] == CMD_ID_ERROR:
+            error_id = response[1]
+            print("Received CMD Error for: ", hex(cmd), "with ID:", hex(error_id))
+            return CMD_RESP_STATUS_ERROR
+    
+    return CMD_RESP_STATUS_INVALID
 
 
 """

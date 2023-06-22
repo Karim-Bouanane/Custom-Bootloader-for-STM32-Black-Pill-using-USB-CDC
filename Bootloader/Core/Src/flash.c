@@ -1,4 +1,8 @@
 
+
+/* Includes ---------------------------------------------------------------*/
+
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,8 +12,12 @@
 #include "stm32f4xx_hal_flash.h"
 
 
+/* Imported variables -----------------------------------------------------*/
+
 extern CRC_HandleTypeDef hcrc;
 
+
+/* Functions --------------------------------------------------------------*/
 
 /**
  * @brief	This function unlocks the flash memory for writing.
@@ -86,7 +94,7 @@ uint8_t Flash_Write_Word(uint32_t address, uint32_t *data, uint32_t size)
 	HAL_FLASH_Unlock();
 
     // Check if the write operation exceeds the flash memory boundary
-    if ((address < APP_START_ADDRESS) ||
+    if ((address < APP_BASE_ADDRESS) ||
     	((address + (size * 4)) > (APP_END_ADDRESS)) ||
 	    ((address % 4) != 0))
     {
