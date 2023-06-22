@@ -2,31 +2,31 @@
 
 This personal project focuses on developing a customable bootloader specifically designed for the STM32F411 MCU, commonly known as the Black Pill board. The development of the bootloader is based on the HAL library and its main objective is to establish interaction between the microcontroller and a host computer using USB communication. The bootloader's primary functionality includes downloading new firmware, erasing or executing user application. To complement the bootloader, a desktop GUI has been developed using the Python tkinter library. This GUI facilitates the establishement of connection with the bootloader, allowing user to send requests and receive responses, with all events logged and displayed.
 
-## **Table of Contents**
+# **Table of Contents**
 - [**Custom Bootloader for STM32 Black Pill using USB CDC**](#custom-bootloader-for-stm32-black-pill-using-usb-cdc)
-  - [**Table of Contents**](#table-of-contents)
-  - [**Setup Overview**](#setup-overview)
-  - [**Bootloader Features**](#bootloader-features)
-  - [**Development Environment**](#development-environment)
-  - [**Files Structure**](#files-structure)
-  - [**How to use the GUI interface**](#how-to-use-the-gui-interface)
-  - [**Bootloader Flowchart**](#bootloader-flowchart)
-  - [**Bootloader Project Configurations**](#bootloader-project-configurations)
-    - [**GPIO Configuration**](#gpio-configuration)
-    - [**RCC Configuration**](#rcc-configuration)
-    - [**USB Configuration**](#usb-configuration)
-    - [**Bootloader Linker Script**](#bootloader-linker-script)
-    - [**App Linker Script**](#app-linker-script)
-    - [**App Vector Table**](#app-vector-table)
-  - [**Result**](#result)
-    - [**Memory Usage**](#memory-usage)
-    - [**Video Demonstration:**](#video-demonstration)
+- [**Table of Contents**](#table-of-contents)
+- [**Setup Overview**](#setup-overview)
+- [**Bootloader Features**](#bootloader-features)
+- [**Development Environment**](#development-environment)
+- [**Files Structure**](#files-structure)
+- [**How to use the GUI interface**](#how-to-use-the-gui-interface)
+- [**Bootloader Flowchart**](#bootloader-flowchart)
+- [**Bootloader Project Configurations**](#bootloader-project-configurations)
+  - [**GPIO Configuration**](#gpio-configuration)
+  - [**RCC Configuration**](#rcc-configuration)
+  - [**USB Configuration**](#usb-configuration)
+  - [**Bootloader Linker Script**](#bootloader-linker-script)
+  - [**App Linker Script**](#app-linker-script)
+  - [**App Vector Table**](#app-vector-table)
+- [**Result**](#result)
+  - [**Memory Usage**](#memory-usage)
+  - [**Video Demonstration:**](#video-demonstration)
 
-## **Setup Overview**
+# **Setup Overview**
 
 ![](./img/Project_Materials.jpg)
 
-## **Bootloader Features**
+# **Bootloader Features**
 
 - Flash Erase
 - Flash Programming
@@ -34,7 +34,7 @@ This personal project focuses on developing a customable bootloader specifically
 - Execute User Application
 - Communication through USB
 
-## **Development Environment**
+# **Development Environment**
 
 - **Hardware**
 
@@ -55,7 +55,7 @@ This personal project focuses on developing a customable bootloader specifically
 
 
 
-## **Files Structure**
+# **Files Structure**
     
     .
     ├── App                                 # STM32 Project for a simple blink application
@@ -96,7 +96,7 @@ To ensure the two programs reside in independent memory areas, the linker script
 
 On the Python side, the project includes a virtual environment that ensures the availability of all library dependencies. The executable file "arm-none-eabi-objcopy.exe" is utilized in the main program to convert .elf files to .bin files. Furthermore, the "serial_api.py" file provides an API for communication with the bootloader.
 
-## **How to use the GUI interface**
+# **How to use the GUI interface**
 
 To enter the bootloader mode in the STM32, press and hold the User Key button before resetting the MCU.Release the button when the Blue LED start blinking 3 times.
 
@@ -115,24 +115,28 @@ Once in the bootloader mode, you can utilize the Python GUI interface, that is f
 ![](./img/Bootloader_Command_Interface.png)
 
 
-## **Bootloader Flowchart**
+# **Bootloader Flowchart**
 
 ![](./img/Bootloader_Flowchart.png)
 
-## **Bootloader Project Configurations**
+# **Bootloader Project Configurations**
 
-### **GPIO Configuration**
+## **GPIO Configuration**
+
+The User Key is connected to pin PA0 and configured as an input with pull-up mode. This ensures that when the key is pressed, it connects to ground, which represents a low state. Additionally, the Blue LED is set as an output with a high state initially to be turned off in startup.
 
 <p align="center">
   <img src="./img/GPIO_Configuration.png" />
 </p>
 
 
-### **RCC Configuration**
+## **RCC Configuration**
+
+The USB clock must be set to 48 MHz as specified by the USB 2.0 standard requirements. Moreover, opting for the external HSE clock enhances the precision and accuracy of the system.
 
 ![](./img/RCC_Configuration.png)
 
-### **USB Configuration**
+## **USB Configuration**
 
 The Product Identifier (PID) needs to be modified to avoid conflicts with other ST devices that may have the same values. By changing the PID, we ensure that our device has a unique identifier and can be distinguished from others.
 
@@ -141,7 +145,7 @@ The Product Identifier (PID) needs to be modified to avoid conflicts with other 
   <img src="./img/USB_Parameter_Configuration.png" />
 </p>
 
-### **Bootloader Linker Script**
+## **Bootloader Linker Script**
  
 The bootloader will keep the flash origin address because it is the first location to be executed after a reset. However, the memory size allocated for the bootloader is limited to 64K.
 
@@ -149,7 +153,7 @@ The bootloader will keep the flash origin address because it is the first locati
   <img src="./img/Bootloader_Linker_Script.png" />
 </p>
 
-### **App Linker Script**
+## **App Linker Script**
 
 The user application resides in the memory address space that starts after the end address of the bootloader. It utilizes the remaining memory size of the flash.
 
@@ -157,7 +161,7 @@ The user application resides in the memory address space that starts after the e
   <img src="./img/App_Linker_Script.png" />
 </p>
 
-### **App Vector Table**
+## **App Vector Table**
 
 To ensure successful execution of interrupt routines, an offset should be added to the vector table of the user application since its starting address differs from the flash base address. 
 
@@ -165,9 +169,9 @@ To ensure successful execution of interrupt routines, an offset should be added 
   <img src="./img/App_Vector_Table.png" />
 </p>
 
-## **Result**
+# **Result**
 
-### **Memory Usage**
+## **Memory Usage**
 
 - **Bootloader memory usage:**\
 ![](./img/Bootloader_Memory_Usage.png)
@@ -175,4 +179,4 @@ To ensure successful execution of interrupt routines, an offset should be added 
 - **App memory usage:**\
 ![](./img/App_Memory_Usage.png)
 
-### **Video Demonstration:**
+## **Video Demonstration:**
