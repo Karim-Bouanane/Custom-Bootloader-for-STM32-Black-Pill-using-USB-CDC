@@ -6,5 +6,5 @@
 ../Core/Src/bootloader.c:254:6:Bootloader_JumToApplication	24	static,ignoring_inline_asm
 ../Core/Src/bootloader.c:284:6:Bootloader_CheckApplicationExist	16	static
 ../Core/Src/bootloader.c:305:9:Bootloader_EraseApplication	16	static
-../Core/Src/bootloader.c:336:9:Bootloader_DownloadFW	40	static
-../Core/Src/bootloader.c:400:9:Bootloader_VerifyAppChecksum	24	static
+../Core/Src/bootloader.c:336:9:Bootloader_DownloadFW	32	static
+../Core/Src/bootloader.c:393:9:Bootloader_VerifyAppChecksum	24	static

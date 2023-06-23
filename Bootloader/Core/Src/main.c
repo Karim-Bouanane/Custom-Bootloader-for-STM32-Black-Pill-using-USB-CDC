@@ -90,8 +90,7 @@ int main(void)
   MX_GPIO_Init();
 
   // Check if user key is not pressed
-  //if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_RESET)
-  if(false)
+  if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_RESET)
   {
 	// Check if user application exist in flash memory
 	if(Bootloader_CheckApplicationExist() == true)

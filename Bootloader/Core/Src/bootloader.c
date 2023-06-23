@@ -343,8 +343,7 @@ uint8_t Bootloader_DownloadFW(uint16_t total_packets)
 	uint32_t rcv_timeout = 2000;
 	uint32_t address = APP_BASE_ADDRESS;
 
-	//status = Bootloader_EraseApplication();
-	bool already = false;
+	status = Bootloader_EraseApplication();
 
 	if(status == BL_OK)
 	{
@@ -352,17 +351,11 @@ uint8_t Bootloader_DownloadFW(uint16_t total_packets)
 		{
 			status = CDC_ReadRxBuffer_FS(packet_buffer, 64, rcv_timeout);
 
-			if((packet_num == 3) && (already == false))
-			{
-				already = true;
-				status = USBD_FAIL;
-			}
-
 			if(status == USBD_OK)
 			{
 				SendPacketAck(packet_num);
-				/*status = Flash_Write_Word(address, (uint32_t *)packet_buffer, packet_total_words);
-				address = address + packet_size;*/
+				status = Flash_Write_Word(address, (uint32_t *)packet_buffer, packet_total_words);
+				address = address + packet_size;
 				packet_num ++;
 				try_nb = 3;
 

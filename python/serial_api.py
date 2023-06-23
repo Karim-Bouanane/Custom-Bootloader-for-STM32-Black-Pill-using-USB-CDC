@@ -137,8 +137,7 @@ def SendCMD(serial_port, cmd, LOG):
 
     cmd_id = cmd_packet[0]
     LOG("Send " + CMD_NAME_LIST[cmd_id] + " Command")
-    
-    print("Sending Command: ", bytes_to_hex(cmd_packet))
+    #print("Sending Command: ", bytes_to_hex(cmd_packet))
 
     try:
         #
@@ -164,7 +163,7 @@ Description: Receives and verifies the acknowledgment response for a command.
 def ReceiveCmdResp(serial_port, cmd, LOG):
     #
     response = serial_port.read(RESP_SIZE) 
-    print("Response: ", bytes_to_hex(response))
+    #print("Response: ", bytes_to_hex(response))
 
     if len(response) == RESP_SIZE:
 
@@ -223,8 +222,7 @@ Description: Receives acknowledgment for a packet over the serial port.
 def ReceivePacketResp(serial_port, packet_num, LOG):
 
     response = serial_port.read(RESP_SIZE)
-    print("Packet n°:", packet_num, ". Resp length:", len(response) , ". Resp: ", bytes_to_hex(response))
-
+    #print("Packet n°:", packet_num, ". Resp length:", len(response) , ". Resp: ", bytes_to_hex(response))
 
     if len(response) == RESP_SIZE:
         resp_cmd_id = response[0]
@@ -301,7 +299,7 @@ def SendBinaryFile(serial_port, path_to_file, LOG):
                 if SendPacket(serial_port, packet_payload, packet_num, LOG) == False:
                     LOG("Download FW Aborted.")
                     return
-            
+
             LOG("Firmware Successfully Flashed.")
 
         

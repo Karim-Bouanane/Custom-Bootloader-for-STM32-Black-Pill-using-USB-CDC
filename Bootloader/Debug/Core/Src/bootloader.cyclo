@@ -6,5 +6,5 @@ bootloader.c:102:6:Bootloader_Run	17
 bootloader.c:254:6:Bootloader_JumToApplication	1
 bootloader.c:284:6:Bootloader_CheckApplicationExist	3
 bootloader.c:305:9:Bootloader_EraseApplication	5
-bootloader.c:336:9:Bootloader_DownloadFW	8
-bootloader.c:400:9:Bootloader_VerifyAppChecksum	2
+bootloader.c:336:9:Bootloader_DownloadFW	6
+bootloader.c:393:9:Bootloader_VerifyAppChecksum	2
