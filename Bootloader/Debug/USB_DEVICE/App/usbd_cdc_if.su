@@ -5,5 +5,5 @@
 ../USB_DEVICE/App/usbd_cdc_if.c:326:9:CDC_Transmit_FS	24	static
 ../USB_DEVICE/App/usbd_cdc_if.c:355:15:CDC_TransmitCplt_FS	32	static
 ../USB_DEVICE/App/usbd_cdc_if.c:369:9:CDC_ReadRxBuffer_FS	32	static
-../USB_DEVICE/App/usbd_cdc_if.c:395:10:CDC_GetRxBufferBytesAvailable_FS	4	static
-../USB_DEVICE/App/usbd_cdc_if.c:406:6:CDC_FlushRxBuffer_FS	8	static
+../USB_DEVICE/App/usbd_cdc_if.c:396:10:CDC_GetRxBufferBytesAvailable_FS	4	static
+../USB_DEVICE/App/usbd_cdc_if.c:407:6:CDC_FlushRxBuffer_FS	8	static

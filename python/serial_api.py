@@ -4,17 +4,21 @@ import crcmod
 import serial
 
 
-# Packet
+# Command/Response Size
 CMD_SIZE                    = 7
 RESP_SIZE                   = 3
 
-# Response status
+# Command Response Status
 CMD_RESP_STATUS_OK          = 0
 CMD_RESP_STATUS_ERROR       = 1
 CMD_RESP_STATUS_INVALID     = 2
 
-# Commands
+# Packet Response Status 
+PACKET_RESP_ACK             = 0
+PACKET_RESP_NACK            = 1
+PACKET_RESP_INVALID         = 2
 
+# Commands
 CMD_ID_ACK				    = 0x10
 CMD_ID_PACKET			    = 0x20
 CMD_ID_PACKET_ACK		    = 0x30
@@ -36,7 +40,6 @@ CMD_NAME_LIST = {
     CMD_ID_DOWNLOAD_FW  : 'DOWNLOAD_FW'
 }
 
-
 # Errors
 BL_CHKS_MISMATCH			= 0x7F 		# Application checksum incorrect
 BL_CMD_INVALID              = 0x80		# Invalid command
@@ -44,6 +47,17 @@ BL_INVALID_STATE            = 0x81		# Invalid state
 BL_RECEIVE_TIMEOUT          = 0x82		# Receive timeout reached
 BL_DOWNLOAD_FAILED          = 0x83		# Firmware download failed
 BL_NO_USER_APP              = 0x84		# No user application found
+
+ERROR_NAME_LIST = {
+    
+    BL_CHKS_MISMATCH    : "CHECKSUM MISMATH",
+    BL_CMD_INVALID      : "INVALID COMMAND",
+    BL_INVALID_STATE    : "INVALID BOOTLOADER STATE", 
+    BL_RECEIVE_TIMEOUT  : "RECEIVE TIMEOUT",
+    BL_DOWNLOAD_FAILED  : "DOWNLOAD FAILED",
+    BL_NO_USER_APP      : "USER APPLICATION NOT FOUND"
+}
+
 
 """
 Function: bytes_to_hex
@@ -97,7 +111,7 @@ def Connect(com_port):
     bytesize = serial.EIGHTBITS
     stopbits = serial.STOPBITS_ONE
     parity = serial.PARITY_NONE
-    read_timeout = 2                    # value in seconds
+    read_timeout = 10                    # value in seconds
 
     # Create a serial port object with the specified settings
     ser = serial.Serial(com_port, baudrate=baudrate, timeout=read_timeout, 
@@ -116,27 +130,26 @@ Description: Sends a command packet over the serial port and waits for acknowled
 """
 def SendCMD(serial_port, cmd, LOG):
 
-    # Initialize the command packet
-    cmd_packet = bytes(7)
-
     if type(cmd) == int:
-        cmd_packet[0] = cmd
+        cmd_packet = bytes([cmd] + [0]*6)
     else:
-        cmd_packet = cmd + bytes(CMD_SIZE - len(cmd))
+        cmd_packet = cmd + bytes(7 - len(cmd))
 
-    print("cmd_packet: ", cmd_packet)
-
+    cmd_id = cmd_packet[0]
     LOG("Send " + CMD_NAME_LIST[cmd_id] + " Command")
+    
+    print("Sending Command: ", bytes_to_hex(cmd_packet))
 
     try:
-        # Send the command packet over the serial port
+        #
+        serial_port.reset_input_buffer()
+        serial_port.reset_output_buffer()
+        #
         serial_port.write(cmd_packet)
-
-        # Wait for command response
-        return ReceiveCmdResp(serial_port, cmd_id)
+        return ReceiveCmdResp(serial_port, cmd_id, LOG)
         
     except serial.SerialException as e:
-        LOG("Error while sending Command: " + str(e))
+        LOG("Serial Exception while sending CMD: " + str(e))
 
     return CMD_RESP_STATUS_INVALID
 
@@ -148,7 +161,7 @@ Description: Receives and verifies the acknowledgment response for a command.
 @param cmd: The command for which to receive the response.
 @return: 
 """
-def ReceiveCmdResp(serial_port, cmd):
+def ReceiveCmdResp(serial_port, cmd, LOG):
     #
     response = serial_port.read(RESP_SIZE) 
     print("Response: ", bytes_to_hex(response))
@@ -156,14 +169,15 @@ def ReceiveCmdResp(serial_port, cmd):
     if len(response) == RESP_SIZE:
 
         if response[0] == CMD_ID_ACK and response[1] == cmd:
-            print("Received CMD Ack for: ", hex(cmd))
+            LOG("Command acknowledgment received.")
             return CMD_RESP_STATUS_OK
         
         elif response[0] == CMD_ID_ERROR:
             error_id = response[1]
-            print("Received CMD Error for: ", hex(cmd), "with ID:", hex(error_id))
+            LOG("Received Error: " + ERROR_NAME_LIST[error_id])
             return CMD_RESP_STATUS_ERROR
     
+    LOG("Invalid Response Packet")
     return CMD_RESP_STATUS_INVALID
 
 
@@ -175,21 +189,25 @@ Description: Sends a packet over the serial port and waits for acknowledgment.
 @param number: The packet number for acknowledgment.
 @return: True if the packet is sent and acknowledged successfully, False otherwise.
 """
-def SendPacket(serial_port, payload, number):
+def SendPacket(serial_port, payload, packet_num, LOG):
     
+    #displayPacket(packet_payload)
     try_nb = 3
 
-     # Attempt to send the packet and receive acknowledgment
+    # Attempt to send the packet and receive acknowledgment
     while try_nb > 0 :
-        serial_port.write(payload)
 
-        if ReceivePacketAck(serial_port, number) == False:
+        LOG("> Send Packet n°:" + str(packet_num))
+        serial_port.write(payload)
+        status = ReceivePacketResp(serial_port, packet_num, LOG)
+
+        if status == PACKET_RESP_NACK:
             try_nb -= 1
         else:
             break
     
     # Check if the maximum number of attempts is reached
-    if try_nb == 0:
+    if status != PACKET_RESP_ACK:
         return False
     
     return True
@@ -202,18 +220,26 @@ Description: Receives acknowledgment for a packet over the serial port.
 @param number: The packet number for acknowledgment.
 @return: True if the acknowledgment is received successfully, False otherwise.
 """
-def ReceivePacketAck(serial_port, number):
+def ReceivePacketResp(serial_port, packet_num, LOG):
 
     response = serial_port.read(RESP_SIZE)
-    
-    if len(response) == RESP_SIZE :
-        resp_cmd = response[0]
+    print("Packet n°:", packet_num, ". Resp length:", len(response) , ". Resp: ", bytes_to_hex(response))
+
+
+    if len(response) == RESP_SIZE:
+        resp_cmd_id = response[0]
         resp_packet_number = response[1] + ((response[2] << 8) & 0xFF00)
     
-        if resp_cmd == CMD_ID_PACKET_ACK and resp_packet_number == number :
-            return True
-        
-    return False
+        if (resp_cmd_id == CMD_ID_PACKET_ACK) and (resp_packet_number == packet_num) :
+            LOG("< Packet n°:" + str(packet_num) + " acknowledged")  
+            return PACKET_RESP_ACK
+
+        elif (resp_cmd_id == CMD_ID_PACKET_NACK) and (resp_packet_number == packet_num) :
+            LOG("< Packet n°:" + str(packet_num) + " not acknowledged")  
+            return PACKET_RESP_NACK
+
+    LOG("< Invalid Response for Packet n°:" + str(packet_num))    
+    return PACKET_RESP_INVALID
 
 
 """
@@ -221,74 +247,66 @@ Function: SendBinaryFile
 Description: Sends a binary file over the serial port in packets.
 @param serial_port: The serial port object used for communication.
 @param path_to_file: The path to the binary file to be sent.
-@param log_func: The logging function to display messages.
+@param LOG: The logging function to display messages.
 @return: None
 """
-def SendBinaryFile(serial_port, path_to_file, log_func):
+def SendBinaryFile(serial_port, path_to_file, LOG):
 
     packet_size = 64
 
     try:
-
         file_data = []
 
         # Read the file
         with open(path_to_file, "rb") as file:
             file_data = file.read()
 
-        file_size = len(file_data)
+            file_size = len(file_data)
 
-        # Add padding to make it multiple of 64
-        padding_size = 64 - (file_size % 64)
-        padding_data = bytearray(padding_size)
-        file_data += padding_data
+            # Add padding to make it multiple of 64
+            padding_size = 64 - (file_size % 64)
+            padding_data = bytes([0] * padding_size)
+            file_data += padding_data
 
-        # Count number of packets of size 64 bytes
-        total_packets = len(file_data) // packet_size
-        total_packets_inBytes = struct.pack('<H', total_packets)
+            # Count number of packets of size 64 bytes
+            total_packets = len(file_data) // packet_size
+            total_packets_inBytes = struct.pack('<H', total_packets)
 
-        # Calculate the CRC32 value of the file data
-        crc32_value = calculateCRC32(file_data)
-        crc32_value_inBytes = struct.pack('<I', crc32_value)
+            # Calculate the CRC32 value of the file data
+            crc32_value = calculateCRC32(file_data)
+            crc32_value_inBytes = struct.pack('<I', crc32_value)
 
-        # Prepare the command data to send
-        cmd_data = total_packets_inBytes + crc32_value_inBytes
-        
-        log_func("")
-        log_func("--------------- Info ---------------")
-        log_func("Orginal file size \t\t\t: " + str(file_size))
-        log_func("Max packet size \t\t\t: " + str(packet_size))
-        log_func("Total packets to send: " + str(total_packets))
-        log_func("CRC value \t\t\t: 0x{:02X}".format(crc32_value))
-        log_func("-------------------------------------")
-
-        # Send the command to start downloading firmware
-        if SendCMD(serial_port, CMD_ID_DOWNLOAD_FW, cmd_data) == True:
+            # Prepare the command data to send
+            cmd_packet = bytes([CMD_ID_DOWNLOAD_FW]) + total_packets_inBytes + crc32_value_inBytes
             
-            log_func("Start Downloading ....")
-            
-            for i in range(0, total_packets):
+            LOG("")
+            LOG("--------------- Info ---------------")
+            LOG("Orginal file size \t\t\t: " + str(file_size))
+            LOG("Max packet size \t\t\t: " + str(packet_size))
+            LOG("Total packets to send: " + str(total_packets))
+            LOG("CRC value \t\t\t: 0x{:02X}".format(crc32_value))
+            LOG("-------------------------------------\n")
+
+            # Send the command to start downloading firmware
+            if SendCMD(serial_port, cmd_packet, LOG) != CMD_RESP_STATUS_OK:
+                return
+
+            LOG("Start Downloading ....")
+
+            for packet_num in range(0, total_packets):
                 # Extract the next payload
-                packet_payload = file_data[i * packet_size : (i+1) * packet_size]
-                
-                log_func("Sending packet: " + str(i))
-                #displayPacket(packet_payload)
+                packet_payload = file_data[packet_num * packet_size : (packet_num+1) * packet_size]
 
                 # Send the packet payload
-                status = SendPacket(serial_port, packet_payload, i)
+                if SendPacket(serial_port, packet_payload, packet_num, LOG) == False:
+                    LOG("Download FW Aborted.")
+                    return
+            
+            LOG("Firmware Successfully Flashed.")
 
-                if status == True:
-                    log_func("Packet " + str(i) + " sent successfully")
-                else:
-                    log_func("Packet " + str(i) + " failed to be sent")
-                    log_func("Download FW Aborted")
-                    break
-
-        else :
-            log_func("Download FW aborted")
-
+        
     except IOError as e:
-        log_func("Error: " + str(e))
+        LOG("Error while sending binary file: " + str(e))
 
 
 """

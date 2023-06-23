@@ -3,8 +3,8 @@ bootloader.c:51:13:SendCmdAck	2
 bootloader.c:67:13:SendPacketAck	2
 bootloader.c:83:13:SendPacketNAck	2
 bootloader.c:102:6:Bootloader_Run	17
-bootloader.c:252:6:Bootloader_JumToApplication	1
-bootloader.c:282:6:Bootloader_CheckApplicationExist	3
-bootloader.c:303:9:Bootloader_EraseApplication	5
-bootloader.c:334:9:Bootloader_DownloadFW	6
-bootloader.c:391:9:Bootloader_VerifyAppChecksum	2
+bootloader.c:254:6:Bootloader_JumToApplication	1
+bootloader.c:284:6:Bootloader_CheckApplicationExist	3
+bootloader.c:305:9:Bootloader_EraseApplication	5
+bootloader.c:336:9:Bootloader_DownloadFW	8
+bootloader.c:400:9:Bootloader_VerifyAppChecksum	2

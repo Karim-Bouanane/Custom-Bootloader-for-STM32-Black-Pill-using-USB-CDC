@@ -3,8 +3,8 @@
 ../Core/Src/bootloader.c:67:13:SendPacketAck	24	static
 ../Core/Src/bootloader.c:83:13:SendPacketNAck	24	static
 ../Core/Src/bootloader.c:102:6:Bootloader_Run	24	static
-../Core/Src/bootloader.c:252:6:Bootloader_JumToApplication	24	static,ignoring_inline_asm
-../Core/Src/bootloader.c:282:6:Bootloader_CheckApplicationExist	16	static
-../Core/Src/bootloader.c:303:9:Bootloader_EraseApplication	16	static
-../Core/Src/bootloader.c:334:9:Bootloader_DownloadFW	40	static
-../Core/Src/bootloader.c:391:9:Bootloader_VerifyAppChecksum	24	static
+../Core/Src/bootloader.c:254:6:Bootloader_JumToApplication	24	static,ignoring_inline_asm
+../Core/Src/bootloader.c:284:6:Bootloader_CheckApplicationExist	16	static
+../Core/Src/bootloader.c:305:9:Bootloader_EraseApplication	16	static
+../Core/Src/bootloader.c:336:9:Bootloader_DownloadFW	40	static
+../Core/Src/bootloader.c:400:9:Bootloader_VerifyAppChecksum	24	static

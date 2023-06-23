@@ -163,11 +163,16 @@ def flash():
         if file_path.endswith('.elf'):
             file_name = os.path.basename(file_path)
             file_name = file_name[:-4] + '.bin'
+            
+            print("file path:", file_path)
+            print("file_name:", file_name)
 
             LOG('Converting the imported ELF file to BIN ...')
 
+            elf_to_bin_program_path = os.path.dirname(os.path.abspath(__file__)) + "\\objcopy.exe"
+            
             try:
-                result = subprocess.run(['arm-none-eabi-objcopy.exe', '-O', 'binary', file_path, file_name], check=True)
+                result = subprocess.run([elf_to_bin_program_path, '-O', 'binary', file_path, file_name], check=True)
             
                 if result.returncode == 0:
                     LOG("Conversion from ELF to BIN was successful")
@@ -176,7 +181,7 @@ def flash():
                     LOG("Failed to convert ELF to BIN with an error code:" + result.returncode)
                     return
 
-            except FileNotFoundError:
+            except FileNotFoundError as e:
                 LOG("Error: The ARM toolchain objcopy program for the conversion could not be found.")
                 return
             
@@ -204,14 +209,8 @@ def erase():
     if actual_connected_port == '' or serial_port == None:
         LOG("No serial connection established")
         
-    else:
-        LOG("Sending ERASE command to the bootloader")
-
-        # Send the erase command to the bootloader
-        if SendCMD(serial_port, CMD_ID_ERASE_APP) == True:
-            LOG("Bootloader Successfully Erased User Application")
-        else :
-            LOG("Bootloader not responding to ERASE command")
+    elif SendCMD(serial_port, CMD_ID_ERASE_APP, LOG) == CMD_RESP_STATUS_OK:
+        LOG("Bootloader Successfully Erased User Application")
 
 
 """
@@ -228,17 +227,9 @@ def execute():
         LOG("No serial connection established")
 
     else:
-        #LOG("Sending EXECUTE command to the bootloader")
         status = SendCMD(serial_port, CMD_ID_EXECUTE, LOG) 
-
         if status == CMD_RESP_STATUS_OK:
             LOG("Bootloader Executing User Application")
-
-        elif status == CMD_RESP_STATUS_ERROR:
-            LOG("Execute Command Got the following Error")
-
-        else:    
-            LOG("EXECUTE command got invalid response")
 
 
 """

@@ -124,6 +124,8 @@ void Bootloader_Run(void)
     	{
     		case BL_STATE_IDLE:
 
+    			CDC_FlushRxBuffer_FS();
+
     			status = CDC_ReadRxBuffer_FS(packet_buffer, CMD_PACKET_SIZE, MAX_TIMEOUT);
 
     			if(status == USBD_OK)
@@ -135,13 +137,16 @@ void Bootloader_Run(void)
     						break;
 
     					case CMD_ID_DOWNLOAD_FW:
+    		    			total_packets = ((uint16_t)packet_buffer[1] & 0xFF) | (((uint16_t)packet_buffer[2] << 8) & 0xFF00);
+
+    		    			app_checksum = ((uint32_t)packet_buffer[3] & 0xFF) | (((uint32_t)packet_buffer[4] << 8) & 0xFF00) |
+    		    					(((uint32_t)packet_buffer[5] << 16) & 0xFF0000) | (((uint32_t)packet_buffer[6] << 24) & 0xFF000000);
+
     						currentState = BL_STATE_DOWNLOAD_FW;
-    						SendCmdAck(CMD_ID_DOWNLOAD_FW);
     						break;
 
     					case CMD_ID_ERASE_APP:
     						currentState = BL_STATE_ERASE_APP;
-    						SendCmdAck(CMD_ID_ERASE_APP);
     						break;
 
     					default:
@@ -189,10 +194,7 @@ void Bootloader_Run(void)
 
     		case BL_STATE_DOWNLOAD_FW:
 
-    			total_packets = ((uint16_t)packet_buffer[1] & 0xFF) | (((uint16_t)packet_buffer[2] << 8) & 0xFF00);
-
-    			app_checksum = ((uint32_t)packet_buffer[3] & 0xFF) | (((uint32_t)packet_buffer[4] << 8) & 0xFF00) |
-    					(((uint32_t)packet_buffer[5] << 16) & 0xFF0000) | (((uint32_t)packet_buffer[6] << 24) & 0xFF000000);
+    			SendCmdAck(CMD_ID_DOWNLOAD_FW);
 
     			status = Bootloader_DownloadFW(total_packets);
 
@@ -222,12 +224,12 @@ void Bootloader_Run(void)
     			if(status != BL_OK)
     			{
     				error_id = status;
-    				//currentState = BL_STATE_SEND_ERROR;
-    				currentState = BL_STATE_IDLE;
+    				currentState = BL_STATE_SEND_ERROR;
     			}
     			else
     			{
-    				currentState = BL_STATE_IDLE;
+					SendCmdAck(CMD_ID_ERASE_APP);
+					currentState = BL_STATE_IDLE;
     			}
 
     			break;
@@ -337,11 +339,12 @@ uint8_t Bootloader_DownloadFW(uint16_t total_packets)
 	uint8_t try_nb = 3;
 	uint16_t packet_num = 0;
 	uint16_t packet_size = 64;
-	uint16_t packet_size_words = packet_size / 4; // 64/4
+	uint16_t packet_total_words = packet_size / 4; // 64/4
 	uint32_t rcv_timeout = 2000;
 	uint32_t address = APP_BASE_ADDRESS;
 
-	status = Bootloader_EraseApplication();
+	//status = Bootloader_EraseApplication();
+	bool already = false;
 
 	if(status == BL_OK)
 	{
@@ -349,27 +352,33 @@ uint8_t Bootloader_DownloadFW(uint16_t total_packets)
 		{
 			status = CDC_ReadRxBuffer_FS(packet_buffer, 64, rcv_timeout);
 
+			if((packet_num == 3) && (already == false))
+			{
+				already = true;
+				status = USBD_FAIL;
+			}
+
 			if(status == USBD_OK)
 			{
 				SendPacketAck(packet_num);
-				status = Flash_Write_Word(address, (uint32_t *)packet_buffer, packet_size_words);
-				address = address + packet_size;
+				/*status = Flash_Write_Word(address, (uint32_t *)packet_buffer, packet_total_words);
+				address = address + packet_size;*/
 				packet_num ++;
 				try_nb = 3;
 
 				//while(CDC_Transmit_FS(packet_buffer, 64) == USBD_BUSY);
 			}
-			/*else if(try_nb > 0)
+			else if(try_nb > 0)
 			{
 				SendPacketNAck(packet_num);
 				try_nb --;
-			}*/
+			}
 			else
 			{
 				break;
 			}
 
-		} while((packet_num < total_packets) && (status == USBD_OK));
+		} while(packet_num < total_packets);
 
 		if(packet_num != total_packets)
 		{

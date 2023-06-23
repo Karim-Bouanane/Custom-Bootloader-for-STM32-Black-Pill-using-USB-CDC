@@ -379,6 +379,7 @@ uint8_t CDC_ReadRxBuffer_FS(uint8_t* Buf, uint16_t Len, uint32_t timeout)
 
 	if (bytesAvailable < Len)
 	{
+		CDC_FlushRxBuffer_FS();
 		return USBD_FAIL;
 	}
 
